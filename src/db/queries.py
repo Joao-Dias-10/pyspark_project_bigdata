@@ -27,7 +27,7 @@ class Inserter:
             if old_col in df.columns:
                 df = df.withColumnRenamed(old_col, new_col)
 
-        df.write.jdbc(
+        df.write.option("numPartitions", 4).option("batchsize", 1000).jdbc(
             url=self.jdbc_url,
             table=table_name,
             mode=mode,
