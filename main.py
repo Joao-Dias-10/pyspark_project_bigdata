@@ -84,7 +84,7 @@ def run():
     finally:
         if spark:
             spark.stop()
-            logger.info("SparkSession finalizada com sucesso.")
+            logger.info("SparkSession finalizada com sucesso.\n\n")
 
 if __name__ == "__main__":
     run()
