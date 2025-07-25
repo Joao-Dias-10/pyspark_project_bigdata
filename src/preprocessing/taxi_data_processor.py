@@ -5,9 +5,9 @@ from pyspark.sql.functions import col, to_date, current_timestamp, unix_timestam
 
 class TaxiDataProcessor:
 
-    def __init__(self, parquet_path: str):
+    def __init__(self, parquet_path: str, spark: SparkSession):
         self.parquet_path = parquet_path
-        self.spark = SparkSession.builder.appName("Tratamento e Armazenamento de Dados de Táxi com PySpark").getOrCreate()
+        self.spark = spark
         self.df = None
 
     def carregar_dados(self) -> None:
@@ -54,6 +54,3 @@ class TaxiDataProcessor:
 
     def salvar_dados_processados(self, output_path: str) -> None:
         self.df.coalesce(1).write.mode("overwrite").parquet(output_path)
-
-    def encerrar(self) -> None:
-        self.spark.stop()

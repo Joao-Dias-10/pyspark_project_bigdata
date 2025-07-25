@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
+from src.utils.spark_session_factory import SparkSessionFactory     
 from src.utils.logger import LoggerConfig
 from src.utils.excluder import Excluder
 from src.utils.parquet_helper import ParquetHelper
@@ -34,48 +35,56 @@ def run():
         )
         logger = log_config.configurar()
 
-        logger.info("Logger configurado. Iniciando pipeline. Configurando ambiente Hadoop.")
-        os.environ["HADOOP_HOME"] = HADOOP
-        os.environ["PATH"] += os.pathsep + rf"{HADOOP}\bin"
+        logger.info("Logger configurado. Iniciando pipeline e SparkSessionFactory e configurando ambiente Hadoop.")
+        spark_factory = SparkSessionFactory(app_name="PipelineSpark")
+        spark = spark_factory.create()
 
-        # logger.info("Hadoop configurado. Limpando diretórios de dados.")
-        # Excluder(PATH_DATA_RAW).clear_contents()
-        # Excluder(PATH_DATA_PROCESSED).clear_contents()
+        logger.info("SparkSessionFactory configurado. Limpando diretórios de dados.")
+        Excluder(PATH_DATA_RAW).clear_contents()
+        Excluder(PATH_DATA_PROCESSED).clear_contents()
 
-        # logger.info("Diretórios limpos. Gerando URL para download.")
-        # data_suffix = (datetime.now() - relativedelta(months=3)).strftime("%Y-%m")
-        # file = f"{data_suffix}.parquet"
-        # full_url = f"{PARTIAL_URL_TRIP_YELLOW_TAXI}{file}"
+        logger.info("Diretórios limpos. Gerando URL para download.")
+        data_suffix = (datetime.now() - relativedelta(months=3)).strftime("%Y-%m")
+        file = f"{data_suffix}.parquet"
+        full_url = f"{PARTIAL_URL_TRIP_YELLOW_TAXI}{file}"
 
-        # logger.info(f"URL gerada. Iniciando download do arquivo: {file}")
-        # downloader = Downloads()
-        # parquet_path = downloader.download_file(full_url, file)
+        logger.info(f"URL gerada. Iniciando download do arquivo: {file}")
+        downloader = Downloads()
+        parquet_path = downloader.download_file(full_url, file)
 
-        # logger.info("Download finalizado. Iniciando processamento com Spark.")
-        # processor = TaxiDataProcessor(parquet_path)
-        # processor.carregar_dados()
-        # processor.tratar_dados()
+        logger.info("Download finalizado. Iniciando processamento com Spark.")
+        processor = TaxiDataProcessor(parquet_path, spark)
+        processor.carregar_dados()
+        processor.tratar_dados()
 
-        # logger.info("Processamento finalizado. Salvando arquivo tratado.")
-        # output_path = os.path.join(PATH_DATA_PROCESSED, file)
-        # processor.salvar_dados_processados(output_path)
-        # processor.encerrar()
+        logger.info("Processamento finalizado. Salvando arquivo tratado.")
+        output_path = os.path.join(PATH_DATA_PROCESSED, file)
+        processor.salvar_dados_processados(output_path)
 
-        logger.info("Arquivo salvo.Gerando caminho do arquivo.parquet gerado pelo spark.")
-        parquet_gerado_path = ParquetHelper.localizar_arquivo_parquet(rf'D:\pyspark_project_bigdata\data\processed\2025-04.parquet')
+        logger.info("Arquivo salvo. Gerando caminho do arquivo '.parquet' gerado pelo spark.")
+        parquet_gerado_path = ParquetHelper.localizar_arquivo_parquet(output_path)
 
         logger.info("Caminho gerado. Criando tabelas no banco, se necessário.")
         Base.metadata.create_all(engine)
 
         logger.info("Tabelas verificadas. Iniciando inserção dos dados no PostgreSQL.")
-        with Inserter(jdbc_url=JDBC_URL, properties=GET_JDBC_PROPERTIES(), jdbc_driver_path=JDBC_DRIVER_PATH) as inserter:
-            inserter.insert(parquet_path=parquet_gerado_path, table_name="yellow_tripdata")
-
+        inserter = Inserter(
+            spark=spark,
+            jdbc_url=JDBC_URL,
+            properties=GET_JDBC_PROPERTIES(),
+            jdbc_driver_path=JDBC_DRIVER_PATH
+        )
+        inserter.insert(parquet_path=parquet_gerado_path, table_name="yellow_tripdata")
+        
         logger.info("Inserção finalizada. Pipeline concluído com sucesso.")
 
     except Exception as e:
         logger.error(f"Erro registrado: {e}", exc_info=True)
 
+    finally:
+        if spark:
+            spark.stop()
+            logger.info("SparkSession finalizada com sucesso.")
 
 if __name__ == "__main__":
     run()
