@@ -1,6 +1,6 @@
 # 🚀 PySpark Big Data Pipeline
 
-Projeto estruturado em PySpark, com foco em boas práticas, orientação a objetos e escalabilidade para tratamento de grandes volumes de dados. A pipeline inclui carregamento, transformação, limpeza e inserções otimizadas em bancos relacionais como PostgreSQL.
+Projeto estruturado em PySpark, com foco em boas práticas, orientação a objetos e escalabilidade para tratamento de grandes volumes de dados. A pipeline inclui carregamento, transformação, limpeza, inserções otimizadas em bancos relacionais como PostgreSQL e testes unitários.
 
 ---
 
@@ -15,6 +15,7 @@ Essa solução foi construída com foco em **boas práticas de engenharia de dad
 * `SQLAlchemy` para **modelagem e criação de tabelas**
 * `PostgreSQL` como **destino relacional confiável**
 * Estruturação do código em **POO** e módulos reutilizáveis para garantir **manutenibilidade, clareza e escalabilidade**
+* `pytest` utilizado para **testes unitários**, garantindo a **confiabilidade das transformações e manutenção**
 
 O pipeline automatiza todo o fluxo: baixa o dado bruto, trata e transforma os registros, salva de forma otimizada e insere no banco com escrita em lote — tudo controlado por logs e encerramento adequado dos recursos.
 
@@ -25,7 +26,7 @@ O pipeline automatiza todo o fluxo: baixa o dado bruto, trata e transforma os re
 * Python 3.10+
 * PySpark
 * PostgreSQL
-* Pytest
+* Pytest (para testes unitários)
 * SQLAlchemy (para modelagem ORM)
 * notebooks (para testes e verificações rápidas)
 * Dotenv (para gerenciamento de variáveis)
