@@ -20,9 +20,11 @@ Projeto estruturado em PySpark, com foco em boas práticas, orientação a objet
 - PySpark
 - PostgreSQL
 - Pytest
+- SQLAlchemy (para modelagem ORM)
 - notebooks (para testes e verificações rápidas)
-- dotenv (para gerenciamento de variáveis)
-- logging (para rastreamento de execução)
+- Dotenv (para gerenciamento de variáveis)
+- Logging (para rastreamento de execução)
+
 
 ---
 
@@ -38,9 +40,8 @@ Projeto estruturado em PySpark, com foco em boas práticas, orientação a objet
 ├── logs/             # Logs de execução
 ├── notebooks/        # Cadernos Jupyter para testes manuais e EDA
 ├── src/              # Código-fonte principal
-│   ├── automation/   # Scripts de automação e agendamento
+│   ├── automation/   # Scripts de automação 
 │   ├── db/           # Lógica de banco de dados
-│   │   ├── connection.py
 │   │   ├── init\_db.py
 │   │   ├── models.py
 │   │   └── queries.py
@@ -64,11 +65,12 @@ python main.py
 
 ## 🧪 Funcionalidades principais
 
-* Download automático de arquivos `.parquet` via URL
+* SQLAlchemy (para modelagem ORM)
+* Download automático de arquivos .parquet via URL
 * Leitura, limpeza e tratativa de dados com PySpark
 * Conversões de tipo, tratamento de nulos e colunas derivadas
-* Salvamento em formato Parquet (com coalesce para arquivo único)
-* Inserção estruturada em PostgreSQL 
+* Salvamento em formato Parquet (com coalesce para gerar arquivo único)
+  > *Parquet é um formato colunar, altamente eficiente para leitura e compressão, ideal para grandes volumes de dados e processamento distribuído.*
+* Inserção estruturada em PostgreSQL utilizando PySpark para escrita em lote
 
 ---
-
