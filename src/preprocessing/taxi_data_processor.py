@@ -10,12 +10,12 @@ class TaxiDataProcessor:
         self.spark = SparkSession.builder.appName("Tratamento e Armazenamento de Dados de Táxi com PySpark").getOrCreate()
         self.df = None
 
-    def carregar_dados(self):
+    def carregar_dados(self) -> None:
         self.df = self.spark.read.parquet(self.parquet_path)
         print("Esquema dos dados:")
         self.df.printSchema()
 
-    def tratar_dados(self):
+    def tratar_dados(self) -> None:
         df = self.df
 
         # Conversão de timestamp
@@ -52,8 +52,8 @@ class TaxiDataProcessor:
 
         self.df = df
 
-    def salvar_dados_processados(self, output_path: str):
+    def salvar_dados_processados(self, output_path: str) -> None:
         self.df.coalesce(1).write.mode("overwrite").parquet(output_path)
 
-    def encerrar(self):
+    def encerrar(self) -> None:
         self.spark.stop()

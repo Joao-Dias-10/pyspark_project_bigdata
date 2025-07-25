@@ -1,53 +1,81 @@
-from src.utils.logger import LoggerConfig   
-from src.utils.excluder import Excluder  
-from src.utils.config import HADOOP, PARTIAL_URL_TRIP_YELLOW_TAXI, PATH_DATA_RAW, PATH_DATA_PROCESSED
+import os
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
+from src.utils.logger import LoggerConfig
+from src.utils.excluder import Excluder
+from src.utils.parquet_helper import ParquetHelper
+from src.utils.config import (
+    HADOOP,
+    PARTIAL_URL_TRIP_YELLOW_TAXI,
+    PATH_DATA_RAW,
+    PATH_DATA_PROCESSED,
+    JDBC_URL,
+    GET_JDBC_PROPERTIES,
+    JDBC_DRIVER_PATH
+)
+
 from src.automation.downloads import Downloads
 from src.preprocessing.taxi_data_processor import TaxiDataProcessor
 
-from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
+from src.db.models import Base
+from src.db.init_db import engine
+from src.db.queries import Inserter
 
-import os
 
 def run():
     try:
-  
-        log_config = LoggerConfig(log_path='./logs',log_filename='execucao.log',log_level='DEBUG',logger_name='app' )
+
+        log_config = LoggerConfig(
+            log_path='./logs',
+            log_filename='execucao.log',
+            log_level='DEBUG',
+            logger_name='app'
+        )
         logger = log_config.configurar()
 
-        logger.info("Processo iniciado. Referenciando o hadoop para o pyspark usar.")
+        logger.info("Logger configurado. Iniciando pipeline. Configurando ambiente Hadoop.")
         os.environ["HADOOP_HOME"] = HADOOP
         os.environ["PATH"] += os.pathsep + rf"{HADOOP}\bin"
 
-        logger.info("Hadoop configurado. limpando pasta data.")
-        Excluder(PATH_DATA_RAW).clear_contents()
-        Excluder(PATH_DATA_PROCESSED).clear_contents()
+        # logger.info("Hadoop configurado. Limpando diretórios de dados.")
+        # Excluder(PATH_DATA_RAW).clear_contents()
+        # Excluder(PATH_DATA_PROCESSED).clear_contents()
 
-        logger.info("Pasta data limpa. Gerando url com sufixo de data de busca do arquivo.")
-        full_url_with_date_suffix = f'{PARTIAL_URL_TRIP_YELLOW_TAXI}{(datetime.now() - relativedelta(months=3)).strftime("%Y-%m")}.parquet'
-        
-        logger.info("Url gerada. Gerando nome do arquivo com base na url.")
-        file = full_url_with_date_suffix.rstrip("/").split("/")[-1]
+        # logger.info("Diretórios limpos. Gerando URL para download.")
+        # data_suffix = (datetime.now() - relativedelta(months=3)).strftime("%Y-%m")
+        # file = f"{data_suffix}.parquet"
+        # full_url = f"{PARTIAL_URL_TRIP_YELLOW_TAXI}{file}"
 
-        logger.info(rf"Nome do aquivo = {file} e Url de busca gerada = {full_url_with_date_suffix} Iniciando Download file.")
-        downloader = Downloads()
-        parquet_path = downloader.download_file(full_url_with_date_suffix, file)
+        # logger.info(f"URL gerada. Iniciando download do arquivo: {file}")
+        # downloader = Downloads()
+        # parquet_path = downloader.download_file(full_url, file)
 
-        logger.info(f"Arquivo baixado: {parquet_path}. Iniciando processamento com Spark.")
+        # logger.info("Download finalizado. Iniciando processamento com Spark.")
+        # processor = TaxiDataProcessor(parquet_path)
+        # processor.carregar_dados()
+        # processor.tratar_dados()
 
-        processor = TaxiDataProcessor(parquet_path)
-        processor.carregar_dados()
-        processor.tratar_dados()
+        # logger.info("Processamento finalizado. Salvando arquivo tratado.")
+        # output_path = os.path.join(PATH_DATA_PROCESSED, file)
+        # processor.salvar_dados_processados(output_path)
+        # processor.encerrar()
 
-        logger.info(f"Processamento finalizado. Salvando arquivo.parquet")
-        output_path = os.path.join(PATH_DATA_PROCESSED, file)
-        processor.salvar_dados_processados(output_path)
+        logger.info("Arquivo salvo.Gerando caminho do arquivo.parquet gerado pelo spark.")
+        parquet_gerado_path = ParquetHelper.localizar_arquivo_parquet(rf'D:\pyspark_project_bigdata\data\processed\2025-04.parquet')
 
-        processor.encerrar()
-        logger.info("Processos finalizados com sucesso.\n\n")
+        logger.info("Caminho gerado. Criando tabelas no banco, se necessário.")
+        Base.metadata.create_all(engine)
+
+        logger.info("Tabelas verificadas. Iniciando inserção dos dados no PostgreSQL.")
+        with Inserter(jdbc_url=JDBC_URL, properties=GET_JDBC_PROPERTIES(), jdbc_driver_path=JDBC_DRIVER_PATH) as inserter:
+            inserter.insert(parquet_path=parquet_gerado_path, table_name="yellow_tripdata")
+
+        logger.info("Inserção finalizada. Pipeline concluído com sucesso.")
 
     except Exception as e:
-        logger.error(f"Erro registrado: {e}\n\n", exc_info=True)
+        logger.error(f"Erro registrado: {e}", exc_info=True)
+
 
 if __name__ == "__main__":
     run()
