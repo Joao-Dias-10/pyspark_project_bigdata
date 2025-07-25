@@ -4,18 +4,19 @@ Projeto estruturado em PySpark, com foco em boas práticas, orientação a objet
 
 ---
 
-### 🧪 Visão Geral
+### 🎯 Objetivo do Código
 
-* **Processamento distribuído de grandes volumes de dados** com PySpark e arquivos .parquet
-* **Download automático** de arquivos via URL
-* **Leitura, limpeza, tratamento e Conversão de tipos** de dados com `PySpark`
-* **Salvamento otimizado** em formato `.parquet` com coalesce (1 único arquivo)
-  **`.parquet`** é um formato colunar, compacto e eficiente para leitura em escala
-* **`Modelagem ORM com SQLAlchemy`**
-* **Inserção eficiente no `PostgreSQL`** via escrita em lote com PySpark
-* **Boas práticas de engenharia de dados** com `POO` e estrutura modular
-* ✅ **Desempenho real**:
-  `.parquet` com **3.970.553 linhas** processado e inserido no PostgreSQL 
+Automatizar uma pipeline de ingestão, processamento e carregamento de dados, capaz de tratar e inserir **mais de 3.9 milhões de registros** com eficiência, estabilidade e organização.
+
+Essa solução foi construída com foco em **boas práticas de engenharia de dados**, utilizando:
+
+* `PySpark` para **processamento distribuído eficiente**
+* `.parquet` como formato de **armazenamento colunar compacto**
+* `SQLAlchemy` para **modelagem e criação de tabelas**
+* `PostgreSQL` como **destino relacional confiável**
+* Estruturação do código em **POO** e módulos reutilizáveis para garantir **manutenibilidade, clareza e escalabilidade**
+
+O pipeline automatiza todo o fluxo: baixa o dado bruto, trata e transforma os registros, salva de forma otimizada e insere no banco com escrita em lote — tudo controlado por logs e encerramento adequado dos recursos.
 
 ---
 
