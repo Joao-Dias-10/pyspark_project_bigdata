@@ -6,15 +6,14 @@ Projeto estruturado em PySpark, com foco em boas práticas, orientação a objet
 
 ### 🧪 Visão Geral
 
-* **Processamento distribuído de grandes volumes de dados** com PySpark e arquivos `.parquet`
-* **Download automático** de arquivos `.parquet` via URL
-* **Leitura, limpeza e tratamento** de dados com PySpark
-* **Conversão de tipos**, tratamento de nulos e criação de colunas derivadas
-* **Salvamento otimizado** em formato `.parquet` com `coalesce` (1 único arquivo)
+* **Processamento distribuído de grandes volumes de dados** com PySpark e arquivos .parquet
+* **Download automático** de arquivos via URL
+* **Leitura, limpeza, tratamento e Conversão de tipos** de dados com `PySpark`
+* **Salvamento otimizado** em formato `.parquet` com coalesce (1 único arquivo)
   **`.parquet`** é um formato colunar, compacto e eficiente para leitura em escala
-* **Modelagem ORM com SQLAlchemy**
-* **Inserção eficiente no PostgreSQL** via escrita em lote com PySpark
-* **Boas práticas de engenharia de dados** com POO e estrutura modular
+* **`Modelagem ORM com SQLAlchemy`**
+* **Inserção eficiente no `PostgreSQL`** via escrita em lote com PySpark
+* **Boas práticas de engenharia de dados** com `POO` e estrutura modular
 * ✅ **Desempenho real**:
   `.parquet` com **3.970.553 linhas** processado e inserido no PostgreSQL 
 
