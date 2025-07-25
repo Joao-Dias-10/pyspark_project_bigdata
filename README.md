@@ -70,6 +70,7 @@ python main.py
 * Leitura, limpeza e tratativa de dados com PySpark
 * Conversões de tipo, tratamento de nulos e colunas derivadas
 * Salvamento em formato Parquet (com coalesce para gerar arquivo único)
+
   > *Parquet é um formato colunar, altamente eficiente para leitura e compressão, ideal para grandes volumes de dados e processamento distribuído.*
 * Inserção estruturada em PostgreSQL utilizando PySpark para escrita em lote
 
