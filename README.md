@@ -72,4 +72,3 @@ python main.py
 
 ---
 
-# pyspark_project_bigdata
